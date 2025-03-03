@@ -17,16 +17,18 @@ class ResultWord extends StatelessWidget {
       backgroundColor: Colors.white.withOpacity(0),
       body: BaseImageContainer(
         imagePath: 'images/result_word.jpg',
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Center(
-            child: Wrap(
-              alignment: WrapAlignment.center,
-              spacing: 10,
-              runSpacing: 10,
-              children: [
-                ResultWordTile(word: word),
-              ],
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(10),
+            child: Center(
+              child: Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 10,
+                runSpacing: 10,
+                children: [
+                  ResultWordTile(word: word),
+                ],
+              ),
             ),
           ),
         ),

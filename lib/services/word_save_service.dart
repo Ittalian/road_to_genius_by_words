@@ -12,7 +12,7 @@ class WordSaveService {
     required this.word,
   });
 
-  Future<void> save() async {
+  Future<void> save(String meaning) async {
     final String accessToken = dotenv.get('access_token');
     final String databaseId = dotenv.get('database_id');
 
@@ -37,7 +37,7 @@ class WordSaveService {
           "意味": {
             "rich_text": [
               {
-                "text": {"content": word.meaning}
+                "text": {"content": meaning}
               }
             ]
           }

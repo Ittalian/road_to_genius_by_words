@@ -3,15 +3,29 @@ import 'package:road_to_genius_by_words/config/routes.dart';
 import 'package:road_to_genius_by_words/models/word.dart';
 import 'package:road_to_genius_by_words/services/word_save_service.dart';
 import 'package:road_to_genius_by_words/views/widgets/base/base_text_button.dart';
+import 'package:road_to_genius_by_words/views/widgets/base/base_textform_field.dart';
 import 'package:road_to_genius_by_words/views/widgets/loading/loading_dialog.dart';
 
-class ResultWordTile extends StatelessWidget {
+class ResultWordTile extends StatefulWidget {
   final Word word;
 
   const ResultWordTile({
     super.key,
     required this.word,
   });
+
+  @override
+  State<ResultWordTile> createState() => ResultWordTileState();
+}
+
+class ResultWordTileState extends State<ResultWordTile> {
+  String meaning = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _setParams();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,14 +35,19 @@ class ResultWordTile extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(word.value),
-          Text(word.meaning),
+          Text(widget.word.value),
+          BaseTextformField(
+            label: '意味',
+            setValue: (value) => setMeaning(value),
+            isMultiLine: true,
+            defaltParam: widget.word.meaning,
+          ),
           const Padding(padding: EdgeInsets.only(top: 10)),
           BaseTextButton(
             onPressed: () async {
               try {
                 await LoadingDialog.show(context, ('保存中'));
-                await WordSaveService(word: word).save();
+                await WordSaveService(word: widget.word).save(meaning);
                 await LoadingDialog.hide(context);
                 showMessage(context, '保存しました');
                 moveSearch(context);
@@ -46,6 +65,18 @@ class ResultWordTile extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  _setParams() {
+    setState(() {
+      meaning = widget.word.meaning;
+    });
+  }
+
+  setMeaning(String value) {
+    setState(() {
+      meaning = value;
+    });
   }
 
   void moveSearch(BuildContext context) {
