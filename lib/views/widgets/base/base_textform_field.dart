@@ -6,6 +6,7 @@ class BaseTextformField extends StatefulWidget {
   final String? Function(String?)? validator;
   final bool? isMultiLine;
   final String? defaltParam;
+  final TextEditingController? controller;
 
   const BaseTextformField({
     super.key,
@@ -14,6 +15,7 @@ class BaseTextformField extends StatefulWidget {
     this.validator,
     this.isMultiLine,
     this.defaltParam,
+    this.controller,
   });
 
   @override
@@ -21,7 +23,8 @@ class BaseTextformField extends StatefulWidget {
 }
 
 class BaseTextformFieldState extends State<BaseTextformField> {
-  late TextEditingController controller = TextEditingController(text: widget.defaltParam ?? '');
+  late TextEditingController controller = widget.controller ??
+      TextEditingController(text: widget.defaltParam ?? '');
 
   @override
   Widget build(BuildContext context) {

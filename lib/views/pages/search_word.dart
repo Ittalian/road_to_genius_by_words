@@ -50,12 +50,49 @@ class SearchWordState extends State<SearchWord> {
     );
   }
 
-  void moveMemorize(BuildContext context, List<Word> words) {
+  void moveMemorize(BuildContext context, List<Word> words, int questionCount) {
     Navigator.pushNamed(
       context,
       Routes.memorize,
       arguments: {
         'words': words,
+        'questionCount': questionCount,
+      },
+    );
+  }
+
+  Future<void> showQuestionCountDialog() async {
+    TextEditingController controller = TextEditingController();
+
+    await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("問題数は何問にしますか？"),
+          content: TextField(
+            controller: controller,
+            keyboardType: TextInputType.number,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                int questionCount =
+                    controller.text == '' ? 10 : int.parse(controller.text);
+                await LoadingDialog.show(context, '暗記を始めます');
+                List<Word> words = await WordMemorizeService().fetchWords();
+                await LoadingDialog.hide(context);
+                moveMemorize(context, words, questionCount);
+              },
+              child: const Text("開始"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("キャンセル"),
+            ),
+          ],
+        );
       },
     );
   }
@@ -91,14 +128,9 @@ class SearchWordState extends State<SearchWord> {
           ],
         ),
         floatingActionButton: FloatingActionButton(
-          tooltip: '暗記を始める',
-          child: const Icon(Icons.memory),
-          onPressed: () async {
-            await LoadingDialog.show(context, '暗記を始めます');
-            List<Word> words = await WordMemorizeService().fetchWords();
-            await LoadingDialog.hide(context);
-            moveMemorize(context, words);
-          },
+          tooltip: 'テストを開始する',
+          child: const Icon(Icons.edit_document),
+          onPressed: () => showQuestionCountDialog(),
         ),
       ),
     );
