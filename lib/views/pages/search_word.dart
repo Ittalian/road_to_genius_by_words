@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:road_to_genius_by_words/config/routes.dart';
 import 'package:road_to_genius_by_words/models/word.dart';
+import 'package:road_to_genius_by_words/services/word_memorize_service.dart';
 import 'package:road_to_genius_by_words/services/word_sense_service.dart';
 import 'package:road_to_genius_by_words/views/widgets/base/base_button.dart';
 import 'package:road_to_genius_by_words/views/widgets/base/base_image_container.dart';
@@ -49,6 +50,16 @@ class SearchWordState extends State<SearchWord> {
     );
   }
 
+  void moveMemorize(BuildContext context, List<Word> words) {
+    Navigator.pushNamed(
+      context,
+      Routes.memorize,
+      arguments: {
+        'words': words,
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BaseImageContainer(
@@ -67,7 +78,8 @@ class SearchWordState extends State<SearchWord> {
               label: '検索',
               onPressed: () async {
                 await LoadingDialog.show(context, ('検索中'));
-                Word? word = await WordSenseService(value: wordValue).getWords();
+                Word? word =
+                    await WordSenseService(value: wordValue).getWords();
                 await LoadingDialog.hide(context);
                 if (word == null) {
                   throw showErrorMessage('該当する語彙がありません');
@@ -77,6 +89,16 @@ class SearchWordState extends State<SearchWord> {
               },
             )
           ],
+        ),
+        floatingActionButton: FloatingActionButton(
+          tooltip: '暗記を始める',
+          child: const Icon(Icons.memory),
+          onPressed: () async {
+            await LoadingDialog.show(context, '暗記を始めます');
+            List<Word> words = await WordMemorizeService().fetchWords();
+            await LoadingDialog.hide(context);
+            moveMemorize(context, words);
+          },
         ),
       ),
     );
