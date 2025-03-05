@@ -66,13 +66,12 @@ class MemorizeState extends State<Memorize> {
 
   void countCorrect(String answer) {
     final targetWord = questionWords[questionIndex];
-    if (targetWord.meaning == answer) {
+    if (targetWord.answers!.contains(answer)) {
       setState(() {
         correctCount++;
         memorizeWords.add(MemorizeWord(
           word: targetWord,
           answer: answer,
-          isCorrect: true,
         ));
       });
       showCorrectMessage(context);
@@ -82,7 +81,7 @@ class MemorizeState extends State<Memorize> {
         memorizeWords.add(MemorizeWord(
           word: targetWord,
           answer: answer,
-          isCorrect: false,
+          correctAnswer: targetWord.answers,
         ));
       });
       showInCorrectErrorMessage(context);

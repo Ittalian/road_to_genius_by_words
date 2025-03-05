@@ -68,7 +68,10 @@ class SearchWordState extends State<SearchWord> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text("問題数は何問にしますか？"),
+          title: const Text(
+            "問題数を入力",
+            textAlign: TextAlign.center,
+          ),
           content: TextField(
             controller: controller,
             keyboardType: TextInputType.number,
@@ -76,10 +79,11 @@ class SearchWordState extends State<SearchWord> {
           actions: [
             TextButton(
               onPressed: () async {
-                int questionCount =
-                    controller.text == '' ? 10 : int.parse(controller.text);
                 await LoadingDialog.show(context, '暗記を始めます');
                 List<Word> words = await WordMemorizeService().fetchWords();
+                int questionCount = controller.text == ''
+                    ? words.length
+                    : int.parse(controller.text);
                 await LoadingDialog.hide(context);
                 moveMemorize(context, words, questionCount);
               },

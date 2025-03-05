@@ -24,9 +24,12 @@ class WordMemorizeService {
       final List<dynamic> results = data['results'];
       if (results.isNotEmpty) {
         return results.map<Word>((result) {
+          final List<dynamic> multiSelect = result['properties']["解答例"]['multi_select'];
+          List<String> answers = multiSelect.map((select) => select['name'].toString()).toList();
           return Word(
             value: result['properties']['名前']['title'][0]['plain_text'],
             meaning: result['properties']['意味']['rich_text'][0]['plain_text'],
+            answers: answers,
           );
         }).toList();
       } else {

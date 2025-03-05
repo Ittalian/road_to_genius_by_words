@@ -24,7 +24,6 @@ class MemorizeWordTile extends StatelessWidget {
           style: const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            decoration: TextDecoration.underline,
           ),
         ),
         const Padding(padding: EdgeInsets.only(top: 5)),
@@ -37,11 +36,11 @@ class MemorizeWordTile extends StatelessWidget {
         ),
         const Padding(padding: EdgeInsets.only(top: 5)),
         Text(
-          memorizeWord.isCorrect ? '正解' : '不正解',
+          memorizeWord.correctAnswer == null ? '正解' : '不正解',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: memorizeWord.isCorrect ? Colors.blue : Colors.red,
+            color: memorizeWord.correctAnswer == null ? Colors.blue : Colors.red,
           ),
         ),
         const Padding(padding: EdgeInsets.only(top: 10)),
@@ -49,12 +48,12 @@ class MemorizeWordTile extends StatelessWidget {
           'あなたの回答：${memorizeWord.answer == '' ? '未回答' : memorizeWord.answer}',
           style: style,
         ),
-        if (!memorizeWord.isCorrect)
+        if (memorizeWord.correctAnswer != null)
           Text(
-            '正しい回答：${memorizeWord.word.meaning}',
+            '正しい回答：${memorizeWord.correctAnswer!.join(', ')}',
             style: style,
           ),
-        const Padding(padding: EdgeInsets.only(top: 20)),
+        const Padding(padding: EdgeInsets.only(top: 30)),
       ],
     );
   }

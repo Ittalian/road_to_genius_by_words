@@ -26,6 +26,7 @@ class WordSaveService {
     final body = jsonEncode(
       {
         "parent": {"database_id": databaseId},
+        "icon": {"type": "emoji", "emoji": "🔡"},
         "properties": {
           "名前": {
             "title": [
@@ -40,6 +41,9 @@ class WordSaveService {
                 "text": {"content": meaning}
               }
             ]
+          },
+          "解答例": {
+            "multi_select": word.answers,
           }
         }
       },
