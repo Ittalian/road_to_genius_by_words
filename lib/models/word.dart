@@ -12,7 +12,7 @@ class Word {
   }
 
   formatMeaning(String meaning) {
-      final RegExp exp = RegExp(r"<[^>]*>");
-      this.meaning = meaning.replaceAll(exp, '').replaceAll('\n', '');
+    final RegExp exp = RegExp(r"<[^>]*>");
+    this.meaning = meaning.replaceAll(exp, '').replaceAll('\n', '');
   }
 }

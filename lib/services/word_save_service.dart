@@ -12,7 +12,7 @@ class WordSaveService {
     required this.word,
   });
 
-  Future<void> save(String meaning) async {
+  Future<void> save(String meaning, List<String> answers) async {
     final String accessToken = dotenv.get('access_token');
     final String databaseId = dotenv.get('database_id');
 
@@ -23,6 +23,8 @@ class WordSaveService {
       'Notion-Version': '2021-05-13',
     };
 
+    final List<Map<String, String>> answerJson =
+        answers.map((answer) => {"name": answer}).toList();
     final body = jsonEncode(
       {
         "parent": {"database_id": databaseId},
@@ -43,7 +45,7 @@ class WordSaveService {
             ]
           },
           "解答例": {
-            "multi_select": word.answers,
+            "multi_select": answerJson,
           }
         }
       },

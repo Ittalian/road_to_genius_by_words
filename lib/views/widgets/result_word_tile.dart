@@ -20,6 +20,7 @@ class ResultWordTile extends StatefulWidget {
 
 class ResultWordTileState extends State<ResultWordTile> {
   String meaning = '';
+  String answer = '';
 
   @override
   void initState() {
@@ -42,12 +43,21 @@ class ResultWordTileState extends State<ResultWordTile> {
             isMultiLine: true,
             defaltParam: widget.word.meaning,
           ),
+          BaseTextformField(
+            label: '解答例',
+            hintText: 'スペース区切りで入力',
+            setValue: (value) => setAnswer(value),
+          ),
           const Padding(padding: EdgeInsets.only(top: 10)),
           BaseTextButton(
             onPressed: () async {
               try {
                 await LoadingDialog.show(context, ('保存中'));
-                await WordSaveService(word: widget.word).save(meaning);
+                List<String> answers = answer.split('、');
+                await WordSaveService(word: widget.word).save(
+                  meaning,
+                  answers,
+                );
                 await LoadingDialog.hide(context);
                 showMessage(context, '保存しました');
                 moveSearch(context);
@@ -76,6 +86,12 @@ class ResultWordTileState extends State<ResultWordTile> {
   setMeaning(String value) {
     setState(() {
       meaning = value;
+    });
+  }
+
+  setAnswer(String value) {
+    setState(() {
+      answer = value;
     });
   }
 

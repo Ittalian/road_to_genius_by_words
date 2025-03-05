@@ -7,6 +7,7 @@ class BaseTextformField extends StatefulWidget {
   final bool? isMultiLine;
   final String? defaltParam;
   final TextEditingController? controller;
+  final String? hintText;
 
   const BaseTextformField({
     super.key,
@@ -16,6 +17,7 @@ class BaseTextformField extends StatefulWidget {
     this.isMultiLine,
     this.defaltParam,
     this.controller,
+    this.hintText,
   });
 
   @override
@@ -40,6 +42,7 @@ class BaseTextformFieldState extends State<BaseTextformField> {
         decoration: InputDecoration(
           labelText: widget.label,
           border: InputBorder.none,
+          hintText: widget.hintText,
         ),
         onChanged: (value) => widget.setValue(value),
         keyboardType:
