@@ -52,15 +52,19 @@ class ResultWordTileState extends State<ResultWordTile> {
           BaseTextButton(
             onPressed: () async {
               try {
-                await LoadingDialog.show(context, ('保存中'));
-                List<String> answers = answer.split('、');
-                await WordSaveService(word: widget.word).save(
-                  meaning,
-                  answers,
-                );
-                await LoadingDialog.hide(context);
-                showMessage(context, '保存しました');
-                moveSearch(context);
+                if (answer == '') {
+                  showErrorMessage(context, '解答例を入力してください');
+                } else {
+                  await LoadingDialog.show(context, ('保存中'));
+                  List<String> answers = answer.split('、');
+                  await WordSaveService(word: widget.word).save(
+                    meaning,
+                    answers,
+                  );
+                  await LoadingDialog.hide(context);
+                  showMessage(context, '保存しました');
+                  moveSearch(context);
+                }
               } catch (e) {
                 await LoadingDialog.hide(context);
                 showErrorMessage(context, 'ネットワークエラー: $e');
