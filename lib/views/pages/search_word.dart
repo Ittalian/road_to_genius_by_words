@@ -3,6 +3,7 @@ import 'package:road_to_genius_by_words/config/routes.dart';
 import 'package:road_to_genius_by_words/models/word.dart';
 import 'package:road_to_genius_by_words/services/word_memorize_service.dart';
 import 'package:road_to_genius_by_words/services/word_sense_service.dart';
+import 'package:road_to_genius_by_words/utils/question_type.dart';
 import 'package:road_to_genius_by_words/views/widgets/base/base_button.dart';
 import 'package:road_to_genius_by_words/views/widgets/base/base_image_container.dart';
 import 'package:road_to_genius_by_words/views/widgets/base/base_textform_field.dart';
@@ -50,52 +51,108 @@ class SearchWordState extends State<SearchWord> {
     );
   }
 
-  void moveMemorize(BuildContext context, List<Word> words, int questionCount) {
+  void moevMemorizeStart() {
+    Navigator.pushNamed(
+      context,
+      Routes.memorizeStart,
+    );
+  }
+
+  void moveMemorize(BuildContext context, List<Word> words, int questionCount,
+      QuestionType type) {
     Navigator.pushNamed(
       context,
       Routes.memorize,
       arguments: {
         'words': words,
         'questionCount': questionCount,
+        'type': type,
       },
     );
   }
 
   Future<void> showQuestionCountDialog() async {
-    TextEditingController controller = TextEditingController();
+    TextEditingController countController = TextEditingController();
 
     await showDialog<String>(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text(
-            "問題数を入力",
-            textAlign: TextAlign.center,
-          ),
-          content: TextField(
-            controller: controller,
-            keyboardType: TextInputType.number,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () async {
-                await LoadingDialog.show(context, '暗記を始めます');
-                List<Word> words = await WordMemorizeService().fetchWords();
-                int questionCount = controller.text == ''
-                    ? words.length
-                    : int.parse(controller.text);
-                await LoadingDialog.hide(context);
-                moveMemorize(context, words, questionCount);
-              },
-              child: const Text("開始"),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text("キャンセル"),
-            ),
-          ],
+        QuestionType? selectedType = QuestionType.description;
+
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    '問題数',
+                    textAlign: TextAlign.center,
+                  ),
+                  TextField(
+                    controller: countController,
+                    keyboardType: TextInputType.number,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 30),
+                  const Text(
+                    '問題形式',
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Radio<QuestionType>(
+                        value: QuestionType.description,
+                        groupValue: selectedType,
+                        onChanged: (QuestionType? value) {
+                          setState(() {
+                            if (value != null) {
+                              selectedType = value;
+                            }
+                          });
+                        },
+                      ),
+                      const Text("記述"),
+                      Radio<QuestionType>(
+                        value: QuestionType.selection,
+                        groupValue: selectedType,
+                        onChanged: (QuestionType? value) {
+                          setState(() {
+                            if (value != null) {
+                              selectedType = value;
+                            }
+                          });
+                        },
+                      ),
+                      const Text("選択"),
+                    ],
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () async {
+                    await LoadingDialog.show(context, '暗記を始めます');
+                    List<Word> words = await WordMemorizeService().fetchWords();
+                    int questionCount = countController.text.isEmpty
+                        ? words.length
+                        : int.tryParse(countController.text) ?? words.length;
+                    await LoadingDialog.hide(context);
+                    moveMemorize(context, words, questionCount, selectedType!);
+                  },
+                  child: const Text("開始"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text("キャンセル"),
+                ),
+              ],
+            );
+          },
         );
       },
     );
@@ -134,7 +191,7 @@ class SearchWordState extends State<SearchWord> {
         floatingActionButton: FloatingActionButton(
           tooltip: 'テストを開始する',
           child: const Icon(Icons.edit_document),
-          onPressed: () => showQuestionCountDialog(),
+          onPressed: () => moevMemorizeStart(),
         ),
       ),
     );

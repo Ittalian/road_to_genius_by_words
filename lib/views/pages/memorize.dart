@@ -2,17 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:road_to_genius_by_words/config/routes.dart';
 import 'package:road_to_genius_by_words/models/memorize_word.dart';
 import 'package:road_to_genius_by_words/models/word.dart';
+import 'package:road_to_genius_by_words/utils/question_type.dart';
 import 'package:road_to_genius_by_words/views/widgets/base/base_image_container.dart';
+import 'package:road_to_genius_by_words/views/widgets/memorize_selection.dart';
 import 'package:road_to_genius_by_words/views/widgets/memorize_tile.dart';
 
 class Memorize extends StatefulWidget {
   final List<Word> words;
   final int questionCount;
+  final QuestionType type;
 
   const Memorize({
     super.key,
     required this.words,
     required this.questionCount,
+    required this.type,
   });
 
   @override
@@ -29,6 +33,28 @@ class MemorizeState extends State<Memorize> {
   @override
   void initState() {
     super.initState();
+    getQuestionWords();
+  }
+
+  List<String> getSuggestions() {
+    List<String> targetSuggestions = questionWords
+        .expand((word) => word.answers ?? <String>[])
+        .cast<String>()
+        .toList();
+
+    targetSuggestions = targetSuggestions.toSet().toList();
+    String correctAnswer = questionWords[questionIndex].answers![0];
+    targetSuggestions.removeWhere(
+        (answer) => questionWords[questionIndex].answers!.contains(answer));
+    targetSuggestions.shuffle();
+    List<String> selectedSuggestions = targetSuggestions.take(3).toList();
+    selectedSuggestions.add(correctAnswer);
+    selectedSuggestions.shuffle();
+
+    return selectedSuggestions;
+  }
+
+  void getQuestionWords() {
     questionWords = List<Word>.from(widget.words);
     questionWords.shuffle();
     if (widget.questionCount < questionWords.length) {
@@ -39,14 +65,29 @@ class MemorizeState extends State<Memorize> {
   @override
   Widget build(BuildContext context) {
     return BaseImageContainer(
-      imagePath: 'images/memorize.jpg',
+      imagePath: switch (widget.type) {
+        QuestionType.description => 'images/memorize.jpg',
+        QuestionType.selection => 'images/memorize_selection.jpg',
+      },
       child: Scaffold(
         backgroundColor: Colors.white.withOpacity(0),
-        body: MemorizeTile(
-          word: questionWords[questionIndex],
-          onPressedAnswer: (answer) => countCorrect(answer),
-          finishMemorize: () => moveResultMemorize(),
-          answeredAll: answeredAll,
+        body: PopScope(
+          canPop: false,
+          child: switch (widget.type) {
+            QuestionType.description => MemorizeTile(
+                word: questionWords[questionIndex],
+                onPressedAnswer: (answer) => countCorrect(answer),
+                finishMemorize: () => moveResultMemorize(),
+                answeredAll: answeredAll,
+              ),
+            QuestionType.selection => MemorizeSelection(
+                word: questionWords[questionIndex],
+                suggestions: getSuggestions(),
+                onPressedAnswer: (answer) => countCorrect(answer),
+                finishMemorize: () => moveResultMemorize(),
+                answeredAll: answeredAll,
+              ),
+          },
         ),
       ),
     );
@@ -64,28 +105,36 @@ class MemorizeState extends State<Memorize> {
     }
   }
 
+  void setCorrect(Word targetWord, String answer) {
+    setState(() {
+      correctCount++;
+      memorizeWords.add(MemorizeWord(
+        word: targetWord,
+        answer: answer,
+      ));
+    });
+    showCorrectMessage(context);
+    nextQuestion();
+  }
+
+  void setInCorrect(Word targetWord, String answer) {
+    setState(() {
+      memorizeWords.add(MemorizeWord(
+        word: targetWord,
+        answer: answer,
+        correctAnswer: targetWord.answers,
+      ));
+    });
+    showInCorrectErrorMessage(context);
+    nextQuestion();
+  }
+
   void countCorrect(String answer) {
     final targetWord = questionWords[questionIndex];
     if (targetWord.answers!.contains(answer)) {
-      setState(() {
-        correctCount++;
-        memorizeWords.add(MemorizeWord(
-          word: targetWord,
-          answer: answer,
-        ));
-      });
-      showCorrectMessage(context);
-      nextQuestion();
+      setCorrect(targetWord, answer);
     } else {
-      setState(() {
-        memorizeWords.add(MemorizeWord(
-          word: targetWord,
-          answer: answer,
-          correctAnswer: targetWord.answers,
-        ));
-      });
-      showInCorrectErrorMessage(context);
-      nextQuestion();
+      setInCorrect(targetWord, answer);
     }
   }
 

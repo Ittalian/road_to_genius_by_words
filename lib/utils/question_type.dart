@@ -1,0 +1,4 @@
+enum QuestionType {
+  description,
+  selection,
+}
