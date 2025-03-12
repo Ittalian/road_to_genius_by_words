@@ -62,7 +62,7 @@ class MemorizeStartState extends State<MemorizeStart> {
                         ),
                       ),
                       Container(
-                        margin: const EdgeInsets.fromLTRB(30, 0, 30, 30),
+                        margin: const EdgeInsets.fromLTRB(120, 0, 120, 30),
                         child: TextField(
                           controller: countController,
                           keyboardType: TextInputType.number,

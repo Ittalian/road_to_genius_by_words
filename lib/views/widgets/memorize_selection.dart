@@ -25,12 +25,24 @@ class MemorizeSelection extends StatefulWidget {
 class MemorizeSelectionState extends State<MemorizeSelection> {
   String answer = '';
 
-  @override
-  void initState() {
-    super.initState();
+  void setDefaultAnswer() {
     setState(() {
       answer = widget.suggestions[0];
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    setDefaultAnswer();
+  }
+
+  @override
+  void didUpdateWidget(covariant MemorizeSelection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.word != widget.word) {
+      setDefaultAnswer();
+    }
   }
 
   @override
